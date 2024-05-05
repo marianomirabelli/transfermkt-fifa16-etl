@@ -7,7 +7,7 @@ import pandas as pd
 foot_map = {
     'right': 1,
     'left': 2,
-    'both': random.randint(1,2)
+    'both': lambda: random.randint(1,2)
 }
 
 second_foot_map = {
@@ -407,13 +407,325 @@ def player_init_df():
 
     return pd.DataFrame(headers, dtype=object)
 
-    # Save the dataframe to a CSV file
+##Defensive Skills
+def marking_value(preferred_position) -> int:
+    options = {
+        -1: -1,
+        0: lambda: random.randint(7, 15),
+        **{pos: lambda: random.randint(55, 70) for pos in [3, 5, 7, 10, 14]},
+        **{pos: lambda: random.randint(40, 55) for pos in [12, 16, 18, 27, 23]},
+        **{pos: lambda: random.randint(40, 50) for pos in [21, 25]}
+    }
+    return options.get(preferred_position, lambda: None)()
+
+def standingtackle_value(preferred_position) -> int:
+    options = {
+        -1: -1,
+        0: lambda: random.randint(7, 18),
+        **{pos: lambda: random.randint(55, 70) for pos in [5, 3, 7, 10, 14]},
+        **{pos: lambda: random.randint(40, 55) for pos in [18, 12, 16]},
+        **{pos: lambda: random.randint(25, 40) for pos in [27, 23, 21, 25]}
+    }
+    return options.get(preferred_position, lambda: None)()
+
+def slidingtackle_value(preferred_position) -> int:
+    options = {
+        -1: -1,
+        0: lambda: random.randint(7, 18),
+        **{pos: lambda: random.randint(55, 70) for pos in [5, 3, 7, 10, 14]},
+        **{pos: lambda: random.randint(40, 55) for pos in [18, 12, 16]},
+        **{pos: lambda: random.randint(25, 40) for pos in [27, 23, 21, 25]}
+    }
+    return options.get(preferred_position, lambda: None)()
+
+def aggression_value(preferred_position) -> int:
+    options = {
+        -1: -1,
+        0: lambda: random.randint(20, 45),
+        **{pos: lambda: random.randint(55, 75) for pos in [3, 5, 7, 10, 14]},
+        **{pos: lambda: random.randint(40, 55) for pos in [12, 16, 18, 27, 23]},
+        **{pos: lambda: random.randint(50, 60) for pos in [21, 25]}
+    }
+    return options.get(preferred_position, lambda: None)()
+
+def interceptions_value (preferred_position) -> int:
+    options =  {
+        -1: -1,
+        0: random.randint(7, 18),
+        5 or 3 or 7 or 10 or 14 : random.randint(55, 70),
+        18 or 12 or 16: random.randint(40, 55),
+        27 or 23 or 21 or 25: random.randint(25, 40)
+    }
+    return options.get(preferred_position)
+
+##Midfield Skills
+def shortpassing_value(preferred_position) -> int:
+    options = {
+        -1:-1,
+        0: random.randint(20, 35),
+        3 or 5 or 7: random.randint(45, 62),
+        10 or 14 or 18: random.randint(58, 75),
+        12 or 16 or 27 or 23: random.randint(45, 65),
+        21 or 25: random.randint(50, 70)
+    }
+
+    return options.get(preferred_position)
+
+def interceptions_value(preferred_position) -> int:
+    options = {
+        -1: -1,
+        0: lambda: random.randint(7, 18),
+        **{pos: lambda: random.randint(55, 70) for pos in [5, 3, 7, 10, 14]},
+        **{pos: lambda: random.randint(40, 55) for pos in [18, 12, 16]},
+        **{pos: lambda: random.randint(25, 40) for pos in [27, 23, 21, 25]}
+    }
+    return options.get(preferred_position, lambda: None)()
+
+def shortpassing_value(preferred_position) -> int:
+    options = {
+        -1: -1,
+        0: lambda: random.randint(20, 35),
+        **{pos: lambda: random.randint(45, 62) for pos in [3, 5, 7]},
+        **{pos: lambda: random.randint(58, 75) for pos in [10, 14, 18]},
+        **{pos: lambda: random.randint(45, 65) for pos in [12, 16, 27, 23]},
+        **{pos: lambda: random.randint(50, 70) for pos in [21, 25]}
+    }
+    return options.get(preferred_position, lambda: None)()
+
+def longpassing_value(preferred_position) -> int:
+    options = {
+        -1: -1,
+        0: lambda: random.randint(20, 35),
+        **{pos: lambda: random.randint(25, 45) for pos in [5, 3, 7]},
+        **{pos: lambda: random.randint(58, 70) for pos in [10, 14, 18]},
+        **{pos: lambda: random.randint(55, 65) for pos in [12, 16]},
+        **{pos: lambda: random.randint(40, 58) for pos in [27, 23, 21, 25]}
+    }
+    return options.get(preferred_position, lambda: None)()
+
+def crossing_value(preferred_position) -> int:
+    options = {
+        -1: -1,
+        0: lambda: random.randint(7, 15),
+        5: lambda: random.randint(25, 40),
+        **{pos: lambda: random.randint(58, 70) for pos in [3, 7]},
+        **{pos: lambda: random.randint(55, 65) for pos in [10, 14, 18]},
+        **{pos: lambda: random.randint(58, 70) for pos in [12, 16, 27, 23]},
+        **{pos: lambda: random.randint(45, 65) for pos in [21, 25]}
+    }
+    return options.get(preferred_position, lambda: None)()
+
+def ballcontrol_value(preferred_position) -> int:
+    options = {
+        -1: -1,
+        0: lambda: random.randint(15, 28),
+        **{pos: lambda: random.randint(45, 60) for pos in [3, 5, 7]},
+        **{pos: lambda: random.randint(55, 70) for pos in [10, 14, 18]},
+        **{pos: lambda: random.randint(45, 65) for pos in [12, 16, 27, 23]},
+        **{pos: lambda: random.randint(45, 65) for pos in [21, 25]}
+    }
+    return options.get(preferred_position, lambda: None)()
+
+def vision_value(preferred_position) -> int:
+    options = {
+        -1: -1,
+        0: lambda: random.randint(4, 15),
+        **{pos: lambda: random.randint(25, 35) for pos in [3, 5, 7]},
+        **{pos: lambda: random.randint(55, 70) for pos in [10, 14, 18]},
+        **{pos: lambda: random.randint(45, 55) for pos in [12, 16, 27, 23]},
+        **{pos: lambda: random.randint(35, 55) for pos in [21, 25]}
+    }
+    return options.get(preferred_position, lambda: None)()
+
+def curve_value(preferred_position) -> int:
+    options = {
+        -1: -1,
+        0: lambda: random.randint(10, 28),
+        **{pos: lambda: random.randint(55, 75) for pos in [3, 5, 7]},
+        **{pos: lambda: random.randint(45, 60) for pos in [10, 12, 14, 16, 27, 23]},
+        18: lambda: random.randint(58, 75),
+        **{pos: lambda: random.randint(45, 68) for pos in [21, 25]}
+    }
+    return options.get(preferred_position, lambda: None)()
+
+#Mental Skills
+
+def positioning_value (preferred_position) -> int:
+    return random.randint(20, 35) if preferred_position == 0 else random.randint(45, 70)
+
+def potential_value (preferred_position) -> int:
+    return random.randint(65, 75)
+
+def attacking_work_rate(preferred_position) -> int:
+    options = {
+        -1: -1,
+        **{pos: 1 for pos in [0, 5, 10, 14]},
+        **{pos: 0 for pos in [3, 7, 12, 16]},
+        **{pos: 2 for pos in [18, 27, 23, 21, 25]}
+    }
+    return options.get(preferred_position, -1)
+
+def defensive_work_rate(preferred_position) -> int:
+    options = {
+        -1: -1,
+        **{pos: 2 for pos in [0, 5, 10, 14]},
+        **{pos: 0 for pos in [3, 7, 12, 16]},
+        **{pos: 1 for pos in [18, 27, 23, 21, 25]}
+    }
+    return options.get(preferred_position, -1)
+
+#Attacking Skills
+
+def shotpower_value(preferred_position) -> int:
+    options = {
+        -1: -1,
+        0: lambda: random.randint(15, 30),
+        **{pos: lambda: random.randint(40, 60) for pos in [3, 5, 7]},
+        **{pos: lambda: random.randint(55, 72) for pos in [10, 14, 18, 12, 16]},
+        **{pos: lambda: random.randint(45, 62) for pos in [27, 23]},
+        **{pos: lambda: random.randint(58, 75) for pos in [21, 25]}
+    }
+    return options.get(preferred_position, lambda: None)()
+
+def longshots_value(preferred_position) -> int:
+    options = {
+        -1: -1,
+        0: lambda: random.randint(12, 25),
+        **{pos: lambda: random.randint(25, 45) for pos in [5, 3, 7]},
+        **{pos: lambda: random.randint(58, 70) for pos in [10, 14, 18]},
+        **{pos: lambda: random.randint(48, 68) for pos in [12, 16]},
+        **{pos: lambda: random.randint(58, 70) for pos in [27, 23, 21, 25]}
+    }
+    return options.get(preferred_position, lambda: None)()
+
+def dribbling_value(preferred_position) -> int:
+    options = {
+        -1: -1,
+        0: lambda: random.randint(4, 10),
+        5: lambda: random.randint(15, 30),
+        **{pos: lambda: random.randint(45, 65) for pos in [3, 7]},
+        **{pos: lambda: random.randint(35, 55) for pos in [10, 14]},
+        18: lambda: random.randint(55, 70),
+        **{pos: lambda: random.randint(55, 70) for pos in [12, 16, 27, 23]},
+        **{pos: lambda: random.randint(50, 70) for pos in [21, 25]}
+    }
+    return options.get(preferred_position, lambda: None)()
+
+def volley_value(preferred_position) -> int:
+    options = {
+        -1: -1,
+        0: lambda: random.randint(12, 22),
+        **{pos: lambda: random.randint(35, 50) for pos in [3, 5, 7]},
+        **{pos: lambda: random.randint(45, 60) for pos in [10, 14]},
+        **{pos: lambda: random.randint(45, 65) for pos in [12, 16, 27, 23]},
+        **{pos: lambda: random.randint(58, 70) for pos in [18, 21, 25]}
+    }
+    return options.get(preferred_position, lambda: None)()
+
+def headingaccuracy_value(preferred_position) -> int:
+    options = {
+        -1: -1,
+        0: lambda: random.randint(12, 22),
+        **{pos: lambda: random.randint(35, 45) for pos in [3, 7, 10, 14]},
+        **{pos: lambda: random.randint(35, 52) for pos in [12, 16, 18, 27, 23]},
+        **{pos: lambda: random.randint(55, 70) for pos in [5, 21, 25]}
+    }
+    return options.get(preferred_position, lambda: None)()
+
+def finishing_value(preferred_position) -> int:
+    options = {
+        -1: -1,
+        0: lambda: random.randint(4, 15),
+        **{pos: lambda: random.randint(20, 35) for pos in [3, 5, 7]},
+        **{pos: lambda: random.randint(35, 55) for pos in [10, 14]},
+        **{pos: lambda: random.randint(45, 58) for pos in [12, 16]},
+        **{pos: lambda: random.randint(52, 65) for pos in [27, 23]},
+        **{pos: lambda: random.randint(58, 72) for pos in [18, 21, 25]}
+    }
+    return options.get(preferred_position, lambda: None)()
 
 
-def fill_player_dataframe(df,player, lastnameid):
+
+#Physcical skills
+def sprintspeed_value(preferred_position) -> int:
+    options = {
+        -1: -1,
+        0: lambda: random.randint(20, 32),
+        5: lambda: random.randint(45, 65),
+        **{pos: lambda: random.randint(55, 70) for pos in [3, 7]},
+        **{pos: lambda: random.randint(50, 65) for pos in [10, 14]},
+        18: lambda: random.randint(52, 70),
+        **{pos: lambda: random.randint(58, 75) for pos in [12, 16, 27, 23]},
+        **{pos: lambda: random.randint(52, 68) for pos in [21, 25]}
+    }
+    return options.get(preferred_position, lambda: None)()
+
+def strength_value(preferred_position) -> int:
+    options = {
+        -1: -1,
+        0: lambda: random.randint(50, 70),
+        5: lambda: random.randint(55, 75),
+        **{pos: lambda: random.randint(35, 55) for pos in [3, 7]},
+        **{pos: lambda: random.randint(45, 65) for pos in [10, 14]},
+        18: lambda: random.randint(40, 55),
+        **{pos: lambda: random.randint(40, 55) for pos in [12, 16, 27, 23]},
+        **{pos: lambda: random.randint(55, 75) for pos in [21, 25]}
+    }
+    return options.get(preferred_position, lambda: None)()
+
+def balance_value(preferred_position) -> int:
+    options = {
+        -1: -1,
+        0: lambda: random.randint(45, 65),
+        **{pos: lambda: random.randint(45, 65) for pos in [3, 5, 7]},
+        **{pos: lambda: random.randint(55, 75) for pos in [10, 14, 18]},
+        **{pos: lambda: random.randint(45, 65) for pos in [12, 16, 27, 23]},
+        **{pos: lambda: random.randint(45, 68) for pos in [21, 25]}
+    }
+    return options.get(preferred_position, lambda: None)()
+
+def freekickaccuracy_value(preferred_position) -> int:
+    options = {
+        -1: -1,
+        0: lambda: random.randint(25, 45),
+        **{pos: lambda: random.randint(45, 55) for pos in [3, 5, 7]},
+        **{pos: lambda: random.randint(55, 75) for pos in [10, 14, 18]},
+        **{pos: lambda: random.randint(45, 68) for pos in [12, 16, 27, 23]},
+        **{pos: lambda: random.randint(45, 65) for pos in [21, 25]}
+    }
+    return options.get(preferred_position, lambda: None)()
+
+
+def acceleration_value(preferred_position) -> int:
+    options = {
+        -1: -1,
+        0: lambda: random.randint(10, 25),
+        5: lambda: random.randint(45, 62),
+        **{pos: lambda: random.randint(58, 75) for pos in [3, 7]},
+        **{pos: lambda: random.randint(50, 65) for pos in [10, 14]},
+        18: lambda: random.randint(55, 68),
+        **{pos: lambda: random.randint(58, 75) for pos in [12, 16, 27, 23]},
+        **{pos: lambda: random.randint(52, 68) for pos in [21, 25]}
+    }
+    return options.get(preferred_position, lambda: None)()
+
+def jumping_value(preferred_position) -> int:
+    options = {
+        -1: -1,
+        0: lambda: random.randint(55, 75),
+        5: lambda: random.randint(55, 75),
+        **{pos: lambda: random.randint(45, 55) for pos in [3, 7, 10, 14]},
+        18: lambda: random.randint(45, 60),
+        **{pos: lambda: random.randint(45, 55) for pos in [12, 16, 27, 23]},
+        **{pos: lambda: random.randint(58, 75) for pos in [21, 25]}
+    }
+    return options.get(preferred_position, lambda: None)()
+
+
+def fill_player_dataframe(df,player,player_id, first_name_id,lastnameid, ponderation):
 
         preferred_position = parse_preferred_position(player)
-
+        face_random_index = random.randint(0, len(face_style_map[1]()) - 1)
         shoetypecode = random.randint(0, 255)
         haircolorcode = 1  ##Negro
         facialhairtypecode = random.randint(0, 15)
@@ -421,88 +733,90 @@ def fill_player_dataframe(df,player, lastnameid):
         jerseystylecode = 0  # Normal
         agility = random.randint(50, 68)
         accessorycode4 = 0
-        gksavetype = random.randint(0, 1) if preferred_position == 0 else 0
-        positioning = random.randint(20, 35) if preferred_position == 0 else random.randint(45, 66)
+        gksavetype = (random.randint(0, 1) if preferred_position == 0 else 0) + ponderation()
+        positioning = positioning_value(preferred_position) + ponderation()
         hairtypecode = random.randint(0, 124)
-        standingtackle = random.randint(18, 25) if preferred_position == 0 else random.randint(45, 66)
+        standingtackle = standingtackle_value(preferred_position) + ponderation()
         faceposercode = 0
         preferredposition3 = -1
-        longpassing = random.randint(18, 25) if preferred_position == 0 else random.randint(45, 70)
-        penalties = random.randint(30, 70)
+        longpassing = longpassing_value(preferred_position) + ponderation()
+        penalties = random.randint(35, 70) + ponderation()
         animfreekickstartposcode = random.randint(0, 1)
         animpenaltieskickstylecode = random.randint(0, 2)
         isretiring = 0
-        longshots = random.randint(18, 25) if preferred_position == 0 else random.randint(45, 68)
-        gkdiving = random.randint(55, 66) if preferred_position == 0 else random.randint(4, 16)
-        interceptions = random.randint(18, 30) if preferred_position == 0 else random.randint(38, 70)
+        longshots = longshots_value(preferred_position) + ponderation()
+        gkdiving = (random.randint(55, 66) if preferred_position == 0 else random.randint(4, 16)) + ponderation()
+        interceptions = interceptions_value(preferred_position) + ponderation()
         shoecolorcode2 = random.randint(0, 31)
-        crossing = random.randint(18, 30) if preferred_position == 0 else random.randint(40, 66)
-        potential = random.randint(40, 73)
-        gkreflexes = random.randint(55, 66) if preferred_position == 0 else random.randint(4, 12)
+        crossing = crossing_value(preferred_position) + ponderation()
+        potential = potential_value(preferred_position) + ponderation()
+        gkreflexes = (random.randint(55, 66) if preferred_position == 0 else random.randint(4, 12)) + ponderation()
         finishingcode1 = 0
-        reactions = random.randint(18, 30) if preferred_position == 0 else random.randint(40, 68)
-        vision = random.randint(18, 30) if preferred_position == 0 else random.randint(40, 70)
+        reactions = (random.randint(55, 70) if preferred_position == 0 else random.randint(40, 55)) + ponderation()
+        vision = vision_value(preferred_position) + ponderation()
         contractvaliduntil = random.randint(2025, 2027)
-        finishing = random.randint(18, 25) if preferred_position == 0 else random.randint(44, 68)
-        dribbling = random.randint(18, 25) if preferred_position == 0 else random.randint(44, 70)
-        slidingtackle = random.randint(18, 25) if preferred_position == 0 else random.randint(44, 70)
+        finishing = finishing_value(preferred_position) + ponderation()
+        dribbling = dribbling_value(preferred_position) + ponderation()
+        slidingtackle = slidingtackle_value(preferred_position) + ponderation()
         accessorycode3 = 0
         accessorycolourcode1 = random.randint(0, 1)
-        headtypecode = face_style_map[random.choice(list(face_style_map.keys()))]()[0]  # Give a random face based on african styles
-        sprintspeed = random.randint(18, 25) if preferred_position == 0 else random.randint(44, 70)
+        headtypecode = face_style_map[1]()[face_random_index]  # Give a random face based on african styles
+        firstnameid = first_name_id
+        sprintspeed = sprintspeed_value(preferred_position) + ponderation()
         height = parse_height(player)
         hasseasonaljersey = random.randint(0, 4)
         preferredposition2 = -1
-        strength = random.randint(18, 25) if preferred_position == 0 else random.randint(44, 70)
+        strength = strength_value(preferred_position) + ponderation()
         birthdate = parse_birth_date(player)  ## TODO: Fix date format
-        preferredposition1 = parse_preferred_position(player)
-        ballcontrol = random.randint(18, 25) if preferred_position == 0 else random.randint(44, 70)
-        shotpower = random.randint(18, 25) if preferred_position == 0 else random.randint(44, 70)
+        preferredposition1 = preferred_position
+        ballcontrol = ballcontrol_value(preferred_position) + ponderation()
+        shotpower = shotpower_value(preferred_position) + ponderation()
         trait1 = 0
         socklengthcode = random.randint(0, 1)
         weight = random.randint(65, 85)
         hashighqualityhead = 0
         gkglovetypecode = random.randint(0, 127)
-        balance = random.randint(18, 25) if preferred_position == 0 else random.randint(44, 70)
+        balance = balance_value(preferred_position) + ponderation()
         gender = 0
-        gkkicking = random.randint(50, 70) if preferred_position == 0 else random.randint(4, 11)
+        gkkicking = (random.randint(50, 70) if preferred_position == 0 else random.randint(4, 11)) + ponderation()
         internationalrep = random.randint(1, 3)
         animpenaltiesmotionstylecode = random.randint(0, 1)
-        shortpassing = random.randint(18, 25) if preferred_position == 0 else random.randint(44, 70)
-        freekickaccuracy = random.randint(18, 25) if preferred_position == 0 else random.randint(44, 70)
+        shortpassing = shortpassing_value(preferred_position) + ponderation()
+        freekickaccuracy = freekickaccuracy_value(preferred_position) + ponderation()
         skillmoves = 0 if preferred_position == 0 else random.randint(0, 2)
         usercaneditname = 0
-        attackingworkrate = random.randint(0, 2)
+        attackingworkrate = attacking_work_rate(preferred_position)
         finishingcode2 = 0
-        aggression = random.randint(18, 25) if preferred_position == 0 else random.randint(44, 70)
-        acceleration = random.randint(18, 25) if preferred_position == 0 else random.randint(44, 70)
-        headingaccuracy = random.randint(18, 25) if preferred_position == 0 else random.randint(44, 70)
+        aggression = aggression_value(preferred_position) + ponderation()
+        acceleration = acceleration_value(preferred_position) + ponderation()
+        headingaccuracy = headingaccuracy_value(preferred_position) + ponderation()
         eyebrowcode = random.randint(0, 1)
         runningcode2 = random.randint(0, 127)
-        gkhandling = random.randint(50, 70) if preferred_position == 0 else random.randint(4, 11)
+        gkhandling = (random.randint(50, 70) if preferred_position == 0 else random.randint(4, 11)) + ponderation()
         eyecolorcode = 3
         jerseysleevelengthcode = 0
         accessorycolourcode3 = 0
         accessorycode1 = 0
         playerjointeamdate = parse_joined_on(player)  ## TODO: Fix date format
         headclasscode = 1  ## 1 for Africans
-        defensiveworkrate = random.randint(0, 2)
+        defensiveworkrate = defensive_work_rate(preferred_position)
         nationality = parse_nationality(player)
         preferredfoot = parse_foot(player)
         sideburnscode = 0
         weakfootabilitytypecode = parse_second_foot(player)
-        jumping = random.randint(18, 25) if preferred_position == 0 else random.randint(44, 70)
+        jumping = jumping_value(preferred_position) + ponderation()
         skintypecode = random.randint(0, 1)
         gkkickstyle = 0 if preferred_position == 0 else random.randint(0, 3)
-        stamina = random.randint(18, 25) if preferred_position == 0 else random.randint(44, 70)
-        marking = random.randint(18, 25) if preferred_position == 0 else random.randint(44, 70)
+        stamina = (random.randint(60, 75) if preferred_position == 0 else random.randint(52, 78)) + ponderation()
+        playerid = player_id
+        marking = marking_value(preferred_position)
         accessorycolourcode4 = 0
-        gkpositioning = random.randint(50, 70) if preferred_position == 0 else random.randint(4, 11)
+        gkpositioning = (random.randint(50, 70) if preferred_position == 0 else random.randint(4, 11)) + ponderation()
         trait2 = 0
         skintonecode = random.randint(9, 10)
         shortstyle = 0
-        overallrating = random.randint(55, 68)
-        emotion = 1
+        overallrating = random.randint(55, 70) + ponderation()
+        emotion = random.randint(1, 5)
         jerseyfit = 0
         accessorycode2 = 0
         shoedesigncode = 0
@@ -513,7 +827,7 @@ def fill_player_dataframe(df,player, lastnameid):
         animpenaltiesstartposcode = random.randint(0, 2)
         runningcode1 = 0
         preferredposition4 = -1
-        volleys = random.randint(18, 25) if preferred_position == 0 else random.randint(44, 70)
+        volleys = volley_value(preferred_position) + ponderation()
         accessorycolourcode2 = 0
         facialhaircolorcode = random.randint(0, 2)
 
@@ -553,6 +867,7 @@ def fill_player_dataframe(df,player, lastnameid):
             'accessorycode3': accessorycode3,
             'accessorycolourcode1': accessorycolourcode1,
             'headtypecode': headtypecode,
+            'firstnameid': firstnameid,
             'sprintspeed': sprintspeed,
             'height': height,
             'hasseasonaljersey': hasseasonaljersey,
@@ -600,6 +915,7 @@ def fill_player_dataframe(df,player, lastnameid):
             'skintypecode': skintypecode,
             'gkkickstyle': gkkickstyle,
             'stamina': stamina,
+            'playerid': playerid,
             'marking': marking,
             'accessorycolourcode4': accessorycolourcode4,
             'gkpositioning': gkpositioning,
@@ -686,13 +1002,13 @@ def fill_players_team_link(df, artificial_key, fifa_team_id, player_id, player_p
     return df
 
 
-def create_players_from_club(tfk_club_id, fifa_club_id, starting_player_id, name_id_start_point):
+def create_players_from_club(club_name, tfk_club_id, fifa_club_id, starting_player_id, name_id_start_point,pondeartion):
 
     url = "http://localhost:8000/clubs/%s/players" % tfk_club_id
     response = requests.get(url)
     players_list = response.json()['players']
     firstnameid = name_id_start_point
-    lastnameid = name_id_start_point+1
+    lastnameid = firstnameid+1
     playerid = starting_player_id
 
     player_data_frame = player_init_df()
@@ -702,32 +1018,33 @@ def create_players_from_club(tfk_club_id, fifa_club_id, starting_player_id, name
     for player in players_list:
        if player['position'].replace("-", "").replace(" ", "").lower() in preferred_position_map:
             first_name, last_name = parse_name(player)
-            player_data_frame = fill_player_dataframe(player_data_frame, player, lastnameid)
-            player_name_data_frame = fill_player_names_df(player_name_data_frame,first_name,last_name,firstnameid,lastnameid,90000)
+            player_data_frame = fill_player_dataframe(player_data_frame, player, playerid,firstnameid,lastnameid,pondeartion)
+            player_name_data_frame = fill_player_names_df(player_name_data_frame,first_name,last_name,firstnameid,lastnameid,900000)
             player_team_data_frame = fill_players_team_link(player_team_data_frame,1,fifa_club_id,playerid,parse_preferred_position(player))
-            firstnameid+= 2
+            firstnameid += 2
+            lastnameid= firstnameid+1
             playerid+=1
 
-    player_data_frame.to_csv('player.csv', index=False)
-    player_name_data_frame.to_csv('player_names.csv', index=False)
-    player_team_data_frame.to_csv('player_team.csv', index=False)
+    player_data_frame.to_csv('player%s.csv'%club_name, index=False)
+    player_name_data_frame.to_csv('player_names%s.csv'%club_name, index=False)
+    player_team_data_frame.to_csv('player_team%s.csv'%club_name, index=False)
 
 
 def parse_foot(player) -> int:
-    if "foot" in player and player["foot"]:
+    if "foot" in player and player["foot"] and player["foot"] != 'both':
        return foot_map[player["foot"]]
     else:
        return random.randint(1, 2)
 
 def parse_second_foot(player) -> int:
     if "foot" in player and player["foot"]:
-       return second_foot_map[player["foot"]]
+       return second_foot_map[player["foot"]]()
     else:
        return random.randint(1, 5)
 
 def parse_height(player) -> int:
     if "height" in player and player["height"]:
-       return float(player["height"].replace("m","").replace(",","."))*100
+       return int(float(player["height"].replace("m","").replace(",","."))*100)
     else:
        return random.randint(170, 190)
 
@@ -753,34 +1070,18 @@ def parse_nationality(player) -> int:
         return nations_map["Free Agents Country"]
 
 def parse_birth_date(player) -> int:
-    reference_date = datetime(1970, 1, 1).timestamp()
-
-    if "dateOfBirth" in player and player["dateOfBirth"]:
-        date_string = player["dateOfBirth"]
-        date_object = datetime.strptime(date_string, "%b %d, %Y")
-        return date_object.timestamp() - reference_date
-    else:
-        random_date = datetime(year=random.randint(1989, 2002), month=random.randint(1, 12), day=random.randint(1, 28))
-        return random_date.timestamp() - reference_date
+   return random.randint(148368,154211)
 
 def parse_joined_on(player) -> int:
-    reference_date = datetime(1970, 1, 1).timestamp()
-
-    if "joinedOn" in player and player["joinedOn"]:
-        date_string = player["joinedOn"]
-        date_object = datetime.strptime(date_string, "%b %d, %Y")
-        return date_object.timestamp() - reference_date
-    else:
-        random_date = datetime(year=random.randint(2022, 2024), month=random.randint(1, 12), day=random.randint(1, 28))
-        return random_date.timestamp() - reference_date
+    return random.randint(160237, 160997)
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
 
-    player_team_link_starting_point = 24674
-    player_id_starting = 279949 #From this ID we start creating players
-    player_name_id_starting = 29740
-    team_fifa_id = 30079
-    club_to_import_id_tfk = 30466
+    player_id_starting = 280018 #From this ID we start creating players
+    player_name_id_starting = 29877
+    team_fifa_id = 30075
+    club_to_import_id_tfk = 43417
+    team_name = "Abia-Warriors"
 
-    create_players_from_club(club_to_import_id_tfk, team_fifa_id, player_name_id_starting, player_id_starting)
+    create_players_from_club(team_name, club_to_import_id_tfk, team_fifa_id, player_id_starting,player_name_id_starting,lambda:random.randint(1,3))
