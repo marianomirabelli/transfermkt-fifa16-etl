@@ -1,8 +1,9 @@
-from datetime import datetime
-
+import mysql
 import requests
 import random
 import pandas as pd
+from sqlalchemy import create_engine
+import pymysql
 
 foot_map = {
     'right': 1,
@@ -27,6 +28,7 @@ face_style_map= {
     4: lambda: [random.randint(1500,1528), random.randint(2500,2518)]
 }
 
+
 preferred_position_map = {
     'none': -1,
     'goalkeeper': 0,
@@ -43,6 +45,240 @@ preferred_position_map = {
     'secondstriker': 21,
     'centreforward': 25
 }
+
+#preferred_position_map = {
+#    'none': -1,
+#    'defender': random.choice([5,7,3]),
+#    'midfielder': random.choice([10,14]),
+#    'striker': random.choice([21,25])
+#}
+
+continent_map = {
+    "Albania": "Europe",
+    "Andorra": "Europe",
+    "Armenia": "Asia",
+    "Austria": "Europe",
+    "Azerbaijan": "Asia",
+    "Belarus": "Europe",
+    "Belgium": "Europe",
+    "Bosnia-Herzegovina": "Europe",
+    "Bulgaria": "Europe",
+    "Croatia": "Europe",
+    "Cyprus": "Asia",
+    "Czech Republic": "Europe",
+    "Denmark": "Europe",
+    "England": "Europe",
+    "Montenegro": "Europe",
+    "Faroe Islands": "Europe",
+    "Finland": "Europe",
+    "France": "Europe",
+    "North Macedonia": "Europe",
+    "Georgia": "Asia",
+    "Germany": "Europe",
+    "Greece": "Europe",
+    "Hungary": "Europe",
+    "Iceland": "Europe",
+    "Republic of Ireland": "Europe",
+    "Israel": "Asia",
+    "Italy": "Europe",
+    "Latvia": "Europe",
+    "Liechtenstein": "Europe",
+    "Lithuania": "Europe",
+    "Luxembourg": "Europe",
+    "Malta": "Europe",
+    "Moldova": "Europe",
+    "Netherlands": "Europe",
+    "Northern Ireland": "Europe",
+    "Norway": "Europe",
+    "Poland": "Europe",
+    "Portugal": "Europe",
+    "Romania": "Europe",
+    "Russia": "Europe",
+    "San Marino": "Europe",
+    "Scotland": "Europe",
+    "Slovakia": "Europe",
+    "Slovenia": "Europe",
+    "Spain": "Europe",
+    "Sweden": "Europe",
+    "Switzerland": "Europe",
+    "Turkey": "Asia",
+    "Ukraine": "Europe",
+    "Wales": "Europe",
+    "Serbia": "Europe",
+    "Argentina": "South America",
+    "Bolivia": "South America",
+    "Brazil": "South America",
+    "Chile": "South America",
+    "Colombia": "South America",
+    "Ecuador": "South America",
+    "Paraguay": "South America",
+    "Peru": "South America",
+    "Uruguay": "South America",
+    "Venezuela": "South America",
+    "Anguilla": "North America",
+    "Antigua and Barbuda": "North America",
+    "Aruba": "North America",
+    "Bahamas": "North America",
+    "Barbados": "North America",
+    "Belize": "North America",
+    "Bermuda": "North America",
+    "British Virgin Islands": "North America",
+    "Canada": "North America",
+    "Cayman Islands": "North America",
+    "Costa Rica": "North America",
+    "Cuba": "North America",
+    "Dominica": "North America",
+    "Dominican Republic": "North America",
+    "El Salvador": "North America",
+    "Grenada": "North America",
+    "Guatemala": "North America",
+    "Guyana": "South America",
+    "Haiti": "North America",
+    "Honduras": "North America",
+    "Jamaica": "North America",
+    "Mexico": "North America",
+    "Montserrat": "North America",
+    "Curaçao": "North America",
+    "Nicaragua": "North America",
+    "Panama": "North America",
+    "Puerto Rico": "North America",
+    "St. Kitts and Nevis": "North America",
+    "St. Lucia": "North America",
+    "St. Vincent and the Grenadines": "North America",
+    "Suriname": "South America",
+    "Trinidad and Tobago": "North America",
+    "Turks and Caicos Islands": "North America",
+    "United States": "North America",
+    "US Virgin Islands": "North America",
+    "Tunisia": "Arabia",
+    "Angola": "Africa",
+    "Benin": "Africa",
+    "Botswana": "Africa",
+    "Botsuana": "Africa",
+    "Burkina Faso": "Africa",
+    "Burundi": "Africa",
+    "Cameroon": "Africa",
+    "Cape Verde Islands": "Africa",
+    "Central African Republic": "Africa",
+    "Chad": "Africa",
+    "Congo": "Africa",
+    "Cote d'Ivoire": "Africa",
+    "Djibouti": "Africa",
+    "Congo DR": "Africa",
+    "DR Congo": "Africa",
+    "Egypt": "Arabia",
+    "Equatorial Guinea": "Africa",
+    "Eritrea": "Africa",
+    "Ethiopia": "Africa",
+    "Gabon": "Africa",
+    "Gambia": "Africa",
+    "The Gambia": "Africa",
+    "Ghana": "Africa",
+    "Guinea": "Africa",
+    "Guinea-Bissau": "Africa",
+    "Kenya": "Africa",
+    "Lesotho": "Africa",
+    "Liberia": "Africa",
+    "Libya": "Africa",
+    "Madagascar": "Africa",
+    "Malawi": "Africa",
+    "Mali": "Africa",
+    "Mauritania": "Africa",
+    "Mauritius": "Africa",
+    "Morocco": "Arabia",
+    "Mozambique": "Africa",
+    "Namibia": "Africa",
+    "Niger": "Africa",
+    "Nigeria": "Africa",
+    "Rwanda": "Africa",
+    "São Tomé e Príncipe": "Africa",
+    "Senegal": "Africa",
+    "Seychelles": "Africa",
+    "Sierra Leone": "Africa",
+    "Somalia": "Africa",
+    "South Africa": "Africa",
+    "Sudan": "Africa",
+    "Eswatini": "Africa",
+    "Tanzania": "Africa",
+    "Togo": "Africa",
+    "Algeria": "Arabia",
+    "Uganda": "Africa",
+    "Zambia": "Africa",
+    "Zimbabwe": "Africa",
+    "Afghanistan": "Asia",
+    "Bahrain": "Asia",
+    "Bangladesh": "Asia",
+    "Bhutan": "Asia",
+    "Brunei Darussalam": "Asia",
+    "Cambodia": "Asia",
+    "China PR": "Asia",
+    "Guam": "Oceania",
+    "Hong Kong": "Asia",
+    "India": "Asia",
+    "Indonesia": "Asia",
+    "Iran": "Asia",
+    "Iraq": "Asia",
+    "Japan": "Asia",
+    "Jordan": "Arabia",
+    "Kazakhstan": "Asia",
+    "Korea DPR": "Asia",
+    "Korea Republic": "Asia",
+    "Kuwait": "Asia",
+    "Kyrgyzstan": "Asia",
+    "Laos": "Asia",
+    "Lebanon": "Asia",
+    "Macau": "Asia",
+    "Malaysia": "Asia",
+    "Maldives": "Asia",
+    "Mongolia": "Asia",
+    "Myanmar": "Asia",
+    "Nepal": "Asia",
+    "Oman": "Asia",
+    "Pakistan": "Asia",
+    "Palestine": "Asia",
+    "Philippines": "Asia",
+    "Qatar": "Arabia",
+    "Saudi Arabia": "Asia",
+    "Singapore": "Asia",
+    "Sri Lanka": "Asia",
+    "Syria": "Asia",
+    "Tajikistan": "Asia",
+    "Thailand": "Asia",
+    "Turkmenistan": "Asia",
+    "United Arab Emirates": "Asia",
+    "Uzbekistan": "Asia",
+    "Vietnam": "Asia",
+    "Yemen": "Asia",
+    "American Samoa": "Oceania",
+    "Australia": "Oceania",
+    "Cook Islands": "Oceania",
+    "Fiji": "Oceania",
+    "New Zealand": "Oceania",
+    "Papua New Guinea": "Oceania",
+    "Samoa": "Oceania",
+    "Solomon Islands": "Oceania",
+    "Tahiti": "Oceania",
+    "Tonga": "Oceania",
+    "Vanuatu": "Oceania",
+    "Gibraltar": "Europe",
+    "Greenland": "North America",
+    "Estonia": "Europe",
+    "Timor-Leste": "Asia",
+    "Chinese Taipei": "Asia",
+    "Comoros": "Africa",
+    "New Caledonia": "Oceania",
+    "South Sudan": "Africa",
+    "Kosovo": "Europe",
+}
+
+# Handle special cases or unknowns:
+continent_map["International Men"] = "International"
+continent_map["International Women"] = "International"
+continent_map["Created Players Country"] = "Other"
+continent_map["Free Agents Country"] = "Other"
+continent_map["Rest of World"] = "Other"
+continent_map["Creation Centre Country"] = "Other"
+
 
 nations_map = {
     'Albania': 1,
@@ -145,6 +381,7 @@ nations_map = {
     'Angola': 98,
     'Benin': 99,
     'Botswana': 100,
+    'Botsuana': 100,
     'Burkina Faso': 101,
     'Burundi': 102,
     'Cameroon': 103,
@@ -152,15 +389,17 @@ nations_map = {
     'Central African Republic': 105,
     'Chad': 106,
     'Congo': 107,
-    'Côte d\'Ivoire': 108,
+    "Cote d'Ivoire": 108,
     'Djibouti': 109,
     'Congo DR': 110,
+    "DR Congo": 110,
     'Egypt': 111,
     'Equatorial Guinea': 112,
     'Eritrea': 113,
     'Ethiopia': 114,
     'Gabon': 115,
     'Gambia': 116,
+    'The Gambia': 116,
     'Ghana': 117,
     'Guinea': 118,
     'Guinea-Bissau': 119,
@@ -269,6 +508,13 @@ def player_name_df():
     headers = {
     'name': [],
     'commentaryid': [],
+    'nameId': [],
+    }
+    return pd.DataFrame(headers, dtype=object)
+
+def player_name_dlc_df():
+    headers = {
+    'name': [],
     'nameId': [],
     }
     return pd.DataFrame(headers, dtype=object)
@@ -721,13 +967,40 @@ def jumping_value(preferred_position) -> int:
     }
     return options.get(preferred_position, lambda: None)()
 
+def player_head_type_code(nationality):
+    if (continent_map[nationality] == "Arabia"):
+        return random.choice([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25,
+                             501, 502, 504, 506, 507, 508, 509, 513, 515, 516, 518, 519, 521, 522, 525, 526, 527, 528, 529, 530, 532,
+                             1000, 1001, 1002, 1003, 1004, 1006, 1007, 1009, 1010, 1011, 1012, 1013, 1014, 1016, 1017, 1019, 1023, 1024, 1025,
+                             1500, 1501, 1502, 1503, 1504, 1505, 1506, 1507, 1508, 1509, 1510, 1511, 1512, 1513, 1514, 1515, 1516, 1517,
+                             1518, 1519, 1520, 1521, 1522, 1523, 1524, 1525, 1526, 1527, 1528,
+                             2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014,
+                             2015, 2016, 2017, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027, 2029, 2030,
+                             2500, 2501, 2502, 2503, 2504, 2505, 2506, 2507, 2508, 2509, 2510, 2511, 2512, 2513, 2514, 2515, 2516, 2517, 2518,
+                             3000, 3001, 3005, 3500, 3501, 3502, 3503, 3504, 3505, 4000, 4001, 4002, 4003, 4500, 4502, 4525,  5000, 5001, 5002, 5003])
+    elif (continent_map[nationality] == "Africa"):
+        face_random_index = random.randint(0, len(face_style_map[1]()) - 1)
+        face_style_map[1]()[face_random_index]
+    elif (continent_map[nationality] == "Asia"):
+        face_random_index = random.randint(0, len(face_style_map[2]()) - 1)
+        face_style_map[2]()[face_random_index]
+    elif (continent_map[nationality] == "Europa"):
+        face_random_index = random.randint(0, len(face_style_map[3]()) - 1)
+        face_style_map[3]()[face_random_index]
+
+def player_skin_tone_code(nationality):
+    if (continent_map[nationality] == "Arabia"):
+        return random.choice([1,2,3,4,5,6,8,9,10])
+    else:
+        return random.choice([9,10])
+
 
 def fill_player_dataframe(df,player,player_id, first_name_id,lastnameid, ponderation):
 
         preferred_position = parse_preferred_position(player)
         face_random_index = random.randint(0, len(face_style_map[1]()) - 1)
         shoetypecode = random.randint(0, 255)
-        haircolorcode = 1  ##Negro
+        haircolorcode = random.choice([0, 1, 2, 3, 4, 5, 6, 7, 9])  ##Negro
         facialhairtypecode = random.randint(0, 15)
         curve = random.randint(40, 66)
         jerseystylecode = 0  # Normal
@@ -760,7 +1033,7 @@ def fill_player_dataframe(df,player,player_id, first_name_id,lastnameid, pondera
         slidingtackle = slidingtackle_value(preferred_position) + ponderation()
         accessorycode3 = 0
         accessorycolourcode1 = random.randint(0, 1)
-        headtypecode = face_style_map[1]()[face_random_index]  # Give a random face based on african styles
+        headtypecode = player_head_type_code(player['nationality'][0])  # Give a random face based on african or arabic styles
         firstnameid = first_name_id
         sprintspeed = sprintspeed_value(preferred_position) + ponderation()
         height = parse_height(player)
@@ -798,14 +1071,14 @@ def fill_player_dataframe(df,player,player_id, first_name_id,lastnameid, pondera
         accessorycolourcode3 = 0
         accessorycode1 = 0
         playerjointeamdate = parse_joined_on(player)  ## TODO: Fix date format
-        headclasscode = 1  ## 1 for Africans
+        headclasscode = 1  ## 1 for Africans and Arabics
         defensiveworkrate = defensive_work_rate(preferred_position)
         nationality = parse_nationality(player)
         preferredfoot = parse_foot(player)
         sideburnscode = 0
         weakfootabilitytypecode = parse_second_foot(player)
         jumping = jumping_value(preferred_position) + ponderation()
-        skintypecode = random.randint(0, 1)
+        skintypecode = random.randint(0, 2)
         gkkickstyle = 0 if preferred_position == 0 else random.randint(0, 3)
         stamina = (random.randint(60, 75) if preferred_position == 0 else random.randint(52, 78)) + ponderation()
         playerid = player_id
@@ -813,7 +1086,7 @@ def fill_player_dataframe(df,player,player_id, first_name_id,lastnameid, pondera
         accessorycolourcode4 = 0
         gkpositioning = (random.randint(50, 70) if preferred_position == 0 else random.randint(4, 11)) + ponderation()
         trait2 = 0
-        skintonecode = random.randint(9, 10)
+        skintonecode = player_skin_tone_code(player['nationality'][0]) # Give a random between african and arabic styles
         shortstyle = 0
         overallrating = random.randint(55, 70) + ponderation()
         emotion = random.randint(1, 5)
@@ -823,13 +1096,13 @@ def fill_player_dataframe(df,player,player_id, first_name_id,lastnameid, pondera
         playerjerseynameid = lastnameid  ## TODO: check if this id comes from players_names file
         shoecolorcode1 = 30
         commonnameid = 0
-        bodytypecode = random.randint(1, 9)
+        bodytypecode = random.randint(1, 7)
         animpenaltiesstartposcode = random.randint(0, 2)
         runningcode1 = 0
         preferredposition4 = -1
         volleys = volley_value(preferred_position) + ponderation()
         accessorycolourcode2 = 0
-        facialhaircolorcode = random.randint(0, 2)
+        facialhaircolorcode = random.choice([0,2,3,4]) #Negro
 
         new_player_row = {
             'shoetypecode': shoetypecode,
@@ -867,7 +1140,7 @@ def fill_player_dataframe(df,player,player_id, first_name_id,lastnameid, pondera
             'accessorycode3': accessorycode3,
             'accessorycolourcode1': accessorycolourcode1,
             'headtypecode': headtypecode,
-            'firstnameid': firstnameid,
+            'firstnameid': first_name_id,
             'sprintspeed': sprintspeed,
             'height': height,
             'hasseasonaljersey': hasseasonaljersey,
@@ -959,7 +1232,21 @@ def fill_player_names_df(df, player_name, player_last_name, player_name_id, play
     df = pd.concat([df, pd.DataFrame([last_name_row],dtype=object)], ignore_index=True)
     return df
 
-def fill_players_team_link(df, artificial_key, fifa_team_id, player_id, player_position):
+def fill_player_dlc_names_df(df, player_name, player_last_name, player_name_id, player_lastname_id):
+    name_row = {
+        'name': player_name,
+        'nameId': player_name_id
+    }
+
+    last_name_row = {
+        'name': player_last_name,
+        'nameId': player_lastname_id
+    }
+    df = pd.concat([df, pd.DataFrame([name_row],dtype=object)], ignore_index=True)
+    df = pd.concat([df, pd.DataFrame([last_name_row],dtype=object)], ignore_index=True)
+    return df
+
+def fill_players_team_link(df, artificial_key, fifa_team_id, player_id, player_position,artificial_id):
     leaguegoals= 0
     isamongtopscorers = 0
     yellows = 0
@@ -985,7 +1272,7 @@ def fill_players_team_link(df, artificial_key, fifa_team_id, player_id, player_p
         'isamongtopscorersinteam': isamongtopscorersinteam,
         'jerseynumber': jerseynumber,
         'position': position,
-        'artificialkey': artificialkey,
+        'artificialkey': artificial_id,
         'teamid': teamid,
         'leaguegoalsprevmatch': leaguegoalsprevmatch,
         'injury': injury,
@@ -1002,7 +1289,7 @@ def fill_players_team_link(df, artificial_key, fifa_team_id, player_id, player_p
     return df
 
 
-def create_players_from_club(club_name, tfk_club_id, fifa_club_id, starting_player_id, name_id_start_point,pondeartion):
+def create_players_from_club(club_name, tfk_club_id, fifa_club_id, starting_player_id, name_id_start_point,artificial_id,pondeartion):
 
     url = "http://localhost:8000/clubs/%s/players" % tfk_club_id
     response = requests.get(url)
@@ -1013,21 +1300,44 @@ def create_players_from_club(club_name, tfk_club_id, fifa_club_id, starting_play
 
     player_data_frame = player_init_df()
     player_name_data_frame = player_name_df()
+    player_name_dlc_data_frame = player_name_dlc_df()
     player_team_data_frame = player_team_df()
+
+    engine = create_engine("mysql+pymysql://root@localhost:3306/fifa16")
+
 
     for player in players_list:
        if player['position'].replace("-", "").replace(" ", "").lower() in preferred_position_map:
             first_name, last_name = parse_name(player)
             player_data_frame = fill_player_dataframe(player_data_frame, player, playerid,firstnameid,lastnameid,pondeartion)
             player_name_data_frame = fill_player_names_df(player_name_data_frame,first_name,last_name,firstnameid,lastnameid,900000)
-            player_team_data_frame = fill_players_team_link(player_team_data_frame,1,fifa_club_id,playerid,parse_preferred_position(player))
+            player_name_dlc_data_frame = fill_player_dlc_names_df(player_name_dlc_data_frame,first_name,last_name,firstnameid,lastnameid)
+            player_team_data_frame = fill_players_team_link(player_team_data_frame,1,fifa_club_id,playerid,parse_preferred_position(player),artificial_id)
+            artificial_id+=1
             firstnameid += 2
             lastnameid= firstnameid+1
             playerid+=1
 
-    player_data_frame.to_csv('player%s.csv'%club_name, index=False)
-    player_name_data_frame.to_csv('player_names%s.csv'%club_name, index=False)
-    player_team_data_frame.to_csv('player_team%s.csv'%club_name, index=False)
+   # mydb = mysql.connector.connect(
+   #     host="localhost",
+   #     user="root",
+   #     database="fifa-db"
+   # )
+
+    ##Delete current players from team
+    # print("Connection established")
+    #cursor = mydb.cursor()
+    #cursor.execute("DELETE FROM fifa16.teamplayerlinks WHERE teamid=%s"%fifa_club_id)
+    #mydb.commit()
+
+    player_data_frame.to_sql('players',engine,if_exists='append',index=False)
+    player_name_data_frame.to_sql('playernames', engine, if_exists='append',index=False)
+    player_name_dlc_data_frame.to_sql('dcplayernames',engine, if_exists='append',index=False)
+    player_team_data_frame.to_sql('teamplayerlinks',engine, if_exists='append',index=False)
+
+    print("Next Player Id is : %s\n"%playerid)
+    print("Next Name Id is : %s\n"%firstnameid)
+    print("Next Artificial Key Id is : %s\n" % artificial_id)
 
 
 def parse_foot(player) -> int:
@@ -1046,7 +1356,7 @@ def parse_height(player) -> int:
     if "height" in player and player["height"]:
        return int(float(player["height"].replace("m","").replace(",","."))*100)
     else:
-       return random.randint(170, 190)
+       return random.randint(160, 190)
 
 
 def parse_name(player) -> (str,str):
@@ -1078,10 +1388,14 @@ def parse_joined_on(player) -> int:
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
 
-    player_id_starting = 280018 #From this ID we start creating players
-    player_name_id_starting = 29877
-    team_fifa_id = 30075
-    club_to_import_id_tfk = 43417
-    team_name = "Abia-Warriors"
+    player_id_starting = 281117
+    player_name_id_starting = 30753
+    artificial_id = 25375
+    team_fifa_id = 30072
+    club_to_import_id_tfk = 22944
+    team_name = "Safi"
 
-    create_players_from_club(team_name, club_to_import_id_tfk, team_fifa_id, player_id_starting,player_name_id_starting,lambda:random.randint(1,3))
+    create_players_from_club(team_name, club_to_import_id_tfk, team_fifa_id, player_id_starting,player_name_id_starting,artificial_id,lambda:random.randint(5,7))
+
+# FC Taraba matches with Plateau United. Test with Katsina United if possible
+# Gombe United matches Sharks FC
