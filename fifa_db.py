@@ -1,7 +1,25 @@
 from sqlalchemy import create_engine, text
 import pandas as pd
+import chardet
+
 
 engine = create_engine("mysql+pymysql://root:root@localhost:3306/rfs-fifa")
+
+def detect_encoding(file_path):
+    with open(file_path, 'rb') as file:
+        rawdata = file.read(10000)  # Read a chunk of the file
+        result = chardet.detect(rawdata)
+        return result['encoding']
+
+def drop_table(table_name):
+    with engine.connect() as connection:
+        drop_query = f"DROP TABLE IF EXISTS {table_name};"
+        connection.execute(text(drop_query))
+
+def load_table_from_file(file_path, table_name):
+    detected_encoding = detect_encoding(file_path)
+    df = pd.read_csv(file_path, sep="\t", encoding=detected_encoding)
+    df.to_sql(table_name, con=engine, if_exists="append", index=False)
 
 def get_max_name_id():
     query = text("""
