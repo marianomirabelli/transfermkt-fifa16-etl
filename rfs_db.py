@@ -79,9 +79,11 @@ def fill_player_dataframe(df, rfs_player_df,player_id, first_name_id, last_name_
     ballcontrol = rfs_player_df["ballcontrol"]
     shotpower = rfs_player_df["shotpower"]
     trait1 = rfs_player_df["trait"]
+    if trait1 > 107374182:
+        trait1 = 107374182
     socklengthcode = rfs_player_df["socklength"]
     weight = rfs_player_df["weight"]
-    hashighqualityhead = rfs_player_df["hashighqualityhead"]
+    hashighqualityhead = 0 #Generic Fase
     gkglovetypecode = random.randint(0, 127)
     balance = rfs_player_df["balance"]
     gender = 0
