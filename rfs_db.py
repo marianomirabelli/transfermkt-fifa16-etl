@@ -6,15 +6,42 @@ from sqlalchemy import create_engine, text
 # Create the database engine (replace with your credentials)
 engine = create_engine("mysql+pymysql://root:root@localhost:3306/rfs-fifa")
 
+def drop_players_rfs_table():
+    table_name = "players_rfs"
+
+    with engine.connect() as connection:
+        drop_query = f"DROP TABLE IF EXISTS {table_name};"
+        connection.execute(text(drop_query))
+
+def drop_team_player_links_rfs_table():
+    table_name = "teamplayerlinks_rfs"
+
+    with engine.connect() as connection:
+        drop_query = f"DROP TABLE IF EXISTS {table_name};"
+        connection.execute(text(drop_query))
+
+def load_players_rfs_from_file():
+    input_directory = r'C:\Users\54116\Documents\Juegos\FIFA 16\My-Mods\2nd-Uruguay\RFS-DB'
+    file_path = input_directory+"\players.txt"
+    df = pd.read_csv(file_path, sep="\t", encoding="utf-16")
+    table_name = "players_rfs"  # Specify your target table name
+    df.to_sql(table_name, con=engine, if_exists="append", index=False)
+
+def load_players_team_links_rfs_from_file():
+    input_directory = r'C:\Users\54116\Documents\Juegos\FIFA 16\My-Mods\2nd-Uruguay\RFS-DB'
+    file_path = input_directory+r'\teamplayerlinks.txt'
+    df = pd.read_csv(file_path, sep="\t", encoding="utf-16")
+    table_name = "teamplayerlinks_rfs"  # Specify your target table name
+    df.to_sql(table_name, con=engine, if_exists="append", index=False)
 
 # Example: Reading a full table into a DataFrame
 def query_players_by_team_id(team_id):
         query = text("""
                 SELECT * 
-                FROM `rfs-fifa`.`players-rfs` 
+                FROM `rfs-fifa`.`players_rfs` 
                 WHERE playerid IN (
                     SELECT playerid 
-                    FROM `rfs-fifa`.`teamplayerlinks-rfs` 
+                    FROM `rfs-fifa`.`teamplayerlinks_rfs` 
                     WHERE teamid = :team_id
                 )
             """)

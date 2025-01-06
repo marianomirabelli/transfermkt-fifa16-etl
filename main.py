@@ -281,10 +281,21 @@ def create_players_from_club(team_import_id, fifa_team_id):
     #cursor.execute("DELETE FROM fifa16.teamplayerlinks WHERE teamid=%s"%fifa_club_id)
     #mydb.commit()
 
+    output_directory = r'C:\Users\54116\Documents\Juegos\FIFA 16\My-Mods\2nd-Uruguay\FIFA-DB'
+    players_file=output_directory+r'\players.txt'
+    players_team_file = output_directory+r'\teamplayerlinks.txt'
+    player_names_file = output_directory+r'\playernames.txt'
+    dc_names_file = output_directory+r'\dcplayernames.txt'
+
     player_data_frame.to_sql('players', engine, if_exists='append', index=False)
     player_name_data_frame.to_sql('playernames', engine, if_exists='append', index=False)
     player_name_dlc_data_frame.to_sql('dcplayernames', engine, if_exists='append', index=False)
     player_team_data_frame.to_sql('teamplayerlinks', engine, if_exists='append', index=False)
+
+    player_data_frame.to_csv(players_file, sep='\t', index=False, header=False, mode='a')
+    player_name_data_frame.to_csv(player_names_file, sep='\t', index=False, header=False, mode='a')
+    player_name_dlc_data_frame.to_csv(dc_names_file, sep='\t', index=False, header=False, mode='a')
+    player_team_data_frame.to_csv(players_team_file, sep='\t', index=False, header=False, mode='a')
 
 
 
@@ -292,6 +303,13 @@ def create_players_from_club(team_import_id, fifa_team_id):
 if __name__ == '__main__':
     fifa_team_id = 130020
     team_import_id = 115535
+
+    rfs_db.drop_players_rfs_table()
+    rfs_db.drop_team_player_links_rfs_table()
+
+    rfs_db.load_players_rfs_from_file()
+    rfs_db.load_players_team_links_rfs_from_file()
+
     create_players_from_club(team_import_id, fifa_team_id)
 
 # FC Taraba matches with Plateau United. Test with Katsina United if possible
