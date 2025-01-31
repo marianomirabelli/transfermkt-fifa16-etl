@@ -18,7 +18,7 @@ DB_ENGINE = create_engine("mysql+pymysql://root:root@localhost:3306/rfs-fifa")
 
 default_team_map = {
     'assetid': 130020,
-    'balltype': 113,
+    'balltype': random.randint(1, 253),
     'teamcolor1g': 255,
     'teamcolor1r': 255,
     'teamcolor2b': 0,
@@ -35,7 +35,7 @@ default_team_map = {
     'powid': -1,
     'rightfreekicktakerid': 1,
     'physioid_secondary': 2,
-    'domesticprestige': random.randint(1, 10),
+    'domesticprestige': random.randint(5, 12),
     'genericint2': -1,
     'jerseytype': 1,
     'rivalteam': 111235,
@@ -78,7 +78,7 @@ default_team_map = {
     'penaltytakerid': 1,
     'freekicktakerid': 0,
     'defdefenderline': 10,
-    'internationalprestige': 0,
+    'internationalprestige': random.randint(1, 7),
     'form': -1,
     'genericint1': 50,
     'cccrossing': 50,
@@ -410,6 +410,7 @@ def init_import_context():
     rfs_db.load_players_rfs_from_file()
     rfs_db.load_players_team_links_rfs_from_file()
 
+    fifa_db.drop_table("teamnationlinks")
     fifa_db.drop_table("teams")
     fifa_db.drop_table("players")
     fifa_db.drop_table("playernames")
@@ -421,15 +422,40 @@ def init_import_context():
     player_names_file = os.path.join(MOD_FIFA_DB_BASE_PATH, 'playernames.txt')
     dc_names_file = os.path.join(MOD_FIFA_DB_BASE_PATH, 'dcplayernames.txt')
     teams_file = os.path.join(MOD_FIFA_DB_BASE_PATH, 'teams.txt')
+    team_nations_link_file=os.path.join(MOD_FIFA_DB_BASE_PATH, 'teamnationlinks.txt')
 
     fifa_db.load_table_from_file(teams_file,'teams')
+    fifa_db.load_table_from_file(team_nations_link_file, 'teamnationlinks')
     fifa_db.load_table_from_file(players_file,'players')
     fifa_db.load_table_from_file(players_team_file,'teamplayerlinks')
     fifa_db.load_table_from_file(player_names_file,'playernames')
     fifa_db.load_table_from_file(dc_names_file, 'dcplayernames')
 
-def run_import(team_import_id):
+def link_nation_to_team(team_id, nation_id):
+
+    headers = {
+        'nationid': [],
+        'teamid': [],
+    }
+
+    df = pd.DataFrame(headers, dtype=object)
+
+    row = {
+        'nationid': nation_id,
+        'teamid': team_id,
+    }
+
+    df = pd.concat([df, pd.DataFrame([row], dtype=object)], ignore_index=True)
+
+    nation_team_file = os.path.join(MOD_FIFA_DB_BASE_PATH, 'teamnationlinks.txt')
+    df.to_sql('teamnationlinks', DB_ENGINE, if_exists='append', index=False)
+    df.to_csv(nation_team_file, sep='\t', index=False, header=False, mode='a', encoding='utf-16')
+
+    return df
+
+def run_import(team_import_id,nation_id):
     fifa_created_team_id = create_club_from_rfs(team_import_id)
+    link_nation_to_team(fifa_created_team_id,nation_id)
     create_players_from_club(team_import_id, fifa_created_team_id)
 
 def del_players_from_team(fifa_team_id):
@@ -439,9 +465,10 @@ def del_players_from_team(fifa_team_id):
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     team_import_id = 130372
+    nation_id = transfer_mkt_impl.nations_map['Uruguay']
     #del_players_from_team(fifa_team_id)
     init_import_context()
-    run_import(team_import_id)
+    run_import(team_import_id,nation_id)
 
 
 # FC Taraba matches with Plateau United. Test with Katsina United if possible
