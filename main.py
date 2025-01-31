@@ -35,7 +35,7 @@ default_team_map = {
     'powid': -1,
     'rightfreekicktakerid': 1,
     'physioid_secondary': 2,
-    'domesticprestige': 10,
+    'domesticprestige': random.randint(1, 10),
     'genericint2': -1,
     'jerseytype': 1,
     'rivalteam': 111235,
@@ -70,7 +70,7 @@ default_team_map = {
     'stafftracksuitcolorcode': 0,
     'ccpositioning': 50,
     'busbuildupspeed': 2000000,
-    'transferbudget': 50,
+    'transferbudget': random.randint(1800000, 3500000),
     'ccshooting': 50,
     'overallrating': 50,
     'ccpassing': 1,
@@ -333,7 +333,7 @@ def create_club_from_rfs(rfs_club_id):
 
     new_row['teamid'] = fifa_team_id
     new_row['assetid'] = fifa_team_asset_id
-    new_row['teamname'] = rfs_team_df['name']
+    new_row['teamname'] = rfs_team_df['name'][0]
 
     # Assuming df already exists, otherwise initialize it as an empty DataFrame first
     df = pd.concat([df, pd.DataFrame([new_row], dtype=object)], ignore_index=True)
