@@ -1,3 +1,5 @@
+import os
+
 import pandas as pd
 import transfer_mkt
 import random
@@ -5,6 +7,7 @@ from sqlalchemy import create_engine, text
 
 # Create the database engine (replace with your credentials)
 engine = create_engine("mysql+pymysql://root:root@localhost:3306/rfs-fifa")
+MOD_RFS_DB_BASE_PATH = r'C:\Users\54116\Documents\Juegos\FIFA 16\My-Mods\2nd-Uruguay\RFS-DB'
 
 def drop_players_rfs_table():
     table_name = "players_rfs"
@@ -20,18 +23,29 @@ def drop_team_player_links_rfs_table():
         drop_query = f"DROP TABLE IF EXISTS {table_name};"
         connection.execute(text(drop_query))
 
+def drop_teams_rfs_table():
+    table_name = "teams_rfs"
+
+    with engine.connect() as connection:
+        drop_query = f"DROP TABLE IF EXISTS {table_name};"
+        connection.execute(text(drop_query))
+
 def load_players_rfs_from_file():
-    input_directory = r'C:\Users\54116\Documents\Juegos\FIFA 16\My-Mods\2nd-Uruguay\RFS-DB'
-    file_path = input_directory+"\players.txt"
+    file_path =os.path.join(MOD_RFS_DB_BASE_PATH, 'players.txt')
     df = pd.read_csv(file_path, sep="\t", encoding="utf-16")
     table_name = "players_rfs"  # Specify your target table name
     df.to_sql(table_name, con=engine, if_exists="append", index=False)
 
 def load_players_team_links_rfs_from_file():
-    input_directory = r'C:\Users\54116\Documents\Juegos\FIFA 16\My-Mods\2nd-Uruguay\RFS-DB'
-    file_path = input_directory+r'\teamplayerlinks.txt'
+    file_path =os.path.join(MOD_RFS_DB_BASE_PATH, 'teamplayerlinks.txt')
     df = pd.read_csv(file_path, sep="\t", encoding="utf-16")
     table_name = "teamplayerlinks_rfs"  # Specify your target table name
+    df.to_sql(table_name, con=engine, if_exists="append", index=False)
+
+def load_team_from_file():
+    file_path =os.path.join(MOD_RFS_DB_BASE_PATH, 'teams.txt')
+    df = pd.read_csv(file_path, sep="\t", encoding="utf-16")
+    table_name = "teams_rfs"  # Specify your target table name
     df.to_sql(table_name, con=engine, if_exists="append", index=False)
 
 # Example: Reading a full table into a DataFrame
@@ -52,7 +66,7 @@ def query_players_by_team_id(team_id):
 def query_team_by_id(team_id):
     query = text("""
         SELECT * 
-        FROM `rfs-fifa`.`teams-rfs` 
+        FROM `rfs-fifa`.teams_rfs 
         WHERE teamid = :team_id
     """)
     # Use parameterized query to safely pass the `team_id`
